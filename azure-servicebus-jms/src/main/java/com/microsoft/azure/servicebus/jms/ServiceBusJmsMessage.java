@@ -5,7 +5,6 @@ package com.microsoft.azure.servicebus.jms;
 
 import com.microsoft.azure.servicebus.IMessage;
 import com.microsoft.azure.servicebus.Message;
-import com.microsoft.azure.servicebus.Utils;
 
 import javax.jms.DeliveryMode;
 import javax.jms.Destination;
