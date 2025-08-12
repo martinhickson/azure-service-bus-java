@@ -18,5 +18,6 @@
 	
 	<modules>
 		<module>azure-servicebus</module>
+		<module>azure-servicebus-jms</module>
 	</modules>	
 </project>

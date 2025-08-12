@@ -10,7 +10,7 @@ import java.util.concurrent.ExecutionException;
 
 import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 
-final class Utils {
+public final class Utils {
 
     static <T> T completeFuture(CompletableFuture<T> future) throws InterruptedException, ServiceBusException {
         try {
@@ -51,7 +51,7 @@ final class Utils {
     	return MessageBody.fromSequenceData(sequenceData);
     }
     
-    static MessageBody fromBinay(byte[] binary)
+    public static MessageBody fromBinay(byte[] binary)
     {
     	List<byte[]> binaryData = new ArrayList<>();
     	binaryData.add(binary);

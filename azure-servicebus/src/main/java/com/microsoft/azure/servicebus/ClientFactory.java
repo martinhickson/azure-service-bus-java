@@ -400,7 +400,7 @@ public final class ClientFactory {
         return createMessageReceiverFromEntityPathAsync(messagingFactory, entityPath, null, receiveMode);
     }
     
-    static CompletableFuture<IMessageReceiver> createMessageReceiverFromEntityPathAsync(MessagingFactory messagingFactory, String entityPath, MessagingEntityType entityType, ReceiveMode receiveMode) {
+    public static CompletableFuture<IMessageReceiver> createMessageReceiverFromEntityPathAsync(MessagingFactory messagingFactory, String entityPath, MessagingEntityType entityType, ReceiveMode receiveMode) {
         Utils.assertNonNull("messagingFactory", messagingFactory);
         MessageReceiver receiver = new MessageReceiver(messagingFactory, entityPath, entityType, receiveMode);
         return receiver.initializeAsync().thenApply((v) -> receiver);
