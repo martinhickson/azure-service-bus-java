@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<connector xmlns="http://java.sun.com/xml/ns/j2ee"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee
+                               http://java.sun.com/xml/ns/j2ee/connector_1_5.xsd"
+           version="1.5">
+
+    <display-name>Azure Service Bus Resource Adapter</display-name>
+    <vendor-name>Microsoft Azure</vendor-name>
+    <eis-type>Azure Service Bus</eis-type>
+    <resourceadapter-version>1.0.0</resourceadapter-version>
+    <license>
+        <license-required>false</license-required>
+    </license>
+
+    <resourceadapter>
+        <resourceadapter-class>com.microsoft.azure.servicebus.jca.AzureServiceBusResourceAdapter</resourceadapter-class>
+
+        <outbound-resourceadapter>
+            <connection-definition>
+                <managedconnectionfactory-class>
+                    com.microsoft.azure.servicebus.jca.AzureServiceBusManagedConnectionFactory
+                </managedconnectionfactory-class>
+                
+                <config-property>
+                    <config-property-name>connectionString</config-property-name>
+                    <config-property-type>java.lang.String</config-property-type>
+                    <config-property-value></config-property-value>
+                </config-property>
+                
+                <config-property>
+                    <config-property-name>authType</config-property-name>
+                    <config-property-type>java.lang.String</config-property-type>
+                    <config-property-value>SAS</config-property-value>
+                </config-property>
+                
+                <config-property>
+                    <config-property-name>clientId</config-property-name>
+                    <config-property-type>java.lang.String</config-property-type>
+                    <config-property-value></config-property-value>
+                </config-property>
+                
+                <config-property>
+                    <config-property-name>clientSecret</config-property-name>
+                    <config-property-type>java.lang.String</config-property-type>
+                    <config-property-value></config-property-value>
+                </config-property>
+                
+                <config-property>
+                    <config-property-name>tenantId</config-property-name>
+                    <config-property-type>java.lang.String</config-property-type>
+                    <config-property-value></config-property-value>
+                </config-property>
+                
+                <config-property>
+                    <config-property-name>msiResourceId</config-property-name>
+                    <config-property-type>java.lang.String</config-property-type>
+                    <config-property-value></config-property-value>
+                </config-property>
+
+                <connectionfactory-interface>javax.jms.ConnectionFactory</connectionfactory-interface>
+                <connectionfactory-impl-class>
+                    com.microsoft.azure.servicebus.jca.AzureServiceBusConnectionFactory
+                </connectionfactory-impl-class>
+                
+                <connection-interface>javax.jms.Connection</connection-interface>
+                <connection-impl-class>
+                    com.microsoft.azure.servicebus.jca.AzureServiceBusConnection
+                </connection-impl-class>
+            </connection-definition>
+            
+            <transaction-support>NoTransaction</transaction-support>
+            
+            <authentication-mechanism>
+                <authentication-mechanism-type>BasicPassword</authentication-mechanism-type>
+                <credential-interface>javax.resource.spi.security.PasswordCredential</credential-interface>
+            </authentication-mechanism>
+            
+            <reauthentication-support>false</reauthentication-support>
+        </outbound-resourceadapter>
+
+    </resourceadapter>
+</connector>

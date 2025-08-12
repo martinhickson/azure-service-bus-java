@@ -16,8 +16,9 @@
 		<client-current-version>1.2.18</client-current-version>		
 	</properties>
 	
-	<modules>
-		<module>azure-servicebus</module>
-		<module>azure-servicebus-jms</module>
-	</modules>	
+	    <modules>
+        <module>azure-servicebus</module>
+        <module>azure-servicebus-jms</module>
+        <module>azure-servicebus-jca</module>
+    </modules>	
 </project>
