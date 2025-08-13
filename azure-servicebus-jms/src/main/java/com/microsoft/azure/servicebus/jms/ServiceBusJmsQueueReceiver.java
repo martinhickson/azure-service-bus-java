@@ -182,6 +182,14 @@ public class ServiceBusJmsQueueReceiver implements QueueReceiver {
         }
     }
     
+    /**
+     * Returns true if this receiver is closed.
+     * @return true if closed, false otherwise
+     */
+    public boolean isClosed() {
+        return closed.get();
+    }
+    
     private void validateNotClosed() throws JMSException {
         if (closed.get()) {
             throw new JMSException("QueueReceiver is closed");

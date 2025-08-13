@@ -250,6 +250,14 @@ public class ServiceBusJmsQueueSender implements QueueSender {
         }
     }
     
+    /**
+     * Returns true if this sender is closed.
+     * @return true if closed, false otherwise
+     */
+    public boolean isClosed() {
+        return closed.get();
+    }
+    
     private void validateNotClosed() throws JMSException {
         if (closed.get()) {
             throw new JMSException("QueueSender is closed");
