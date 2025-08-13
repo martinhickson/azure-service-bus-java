@@ -80,10 +80,10 @@ public class ServiceBusJmsQueueReceiver implements QueueReceiver {
         try {
             IMessage serviceBusMessage;
             if (timeout == 0) {
-                // Block indefinitely - use a very long timeout
-                serviceBusMessage = messageReceiver.receive(Duration.ofDays(365));
+                // Block indefinitely - use the parameterless receive
+                serviceBusMessage = messageReceiver.receive();
             } else if (timeout < 0) {
-                return null; // Invalid timeout
+                throw new JMSException("Invalid timeout: " + timeout);
             } else {
                 serviceBusMessage = messageReceiver.receive(Duration.ofMillis(timeout));
             }

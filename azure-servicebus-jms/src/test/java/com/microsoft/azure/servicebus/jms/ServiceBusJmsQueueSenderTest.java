@@ -20,6 +20,8 @@ import java.util.concurrent.CompletableFuture;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 
 /**
  * Comprehensive unit tests for ServiceBusJmsQueueSender.
@@ -48,8 +50,8 @@ public class ServiceBusJmsQueueSenderTest {
         when(mockSession.isClosed()).thenReturn(false);
         when(mockQueue.getQueueName()).thenReturn("test-queue");
         
-        // Mock successful send operations  
-        when(mockServiceBusSender.send(any())).thenReturn(CompletableFuture.completedFuture(null));
+        // Mock successful send operations - send() returns void
+        doNothing().when(mockServiceBusSender).send(any());
         
         // Create queue sender
         queueSender = new ServiceBusJmsQueueSender(mockSession, mockQueue, mockServiceBusSender);
@@ -256,10 +258,8 @@ public class ServiceBusJmsQueueSenderTest {
 
     @Test
     public void testSend_ServiceBusException() throws Exception {
-        // Given
-        CompletableFuture<Void> failedFuture = new CompletableFuture<>();
-        failedFuture.completeExceptionally(new RuntimeException("Azure Service Bus error"));
-        when(mockServiceBusSender.send(any())).thenReturn(failedFuture);
+        // Given - send() throws exception
+        doThrow(new RuntimeException("Azure Service Bus error")).when(mockServiceBusSender).send(any());
         TextMessage message = new ServiceBusJmsTextMessage(mockSession, "test");
 
         // When & Then

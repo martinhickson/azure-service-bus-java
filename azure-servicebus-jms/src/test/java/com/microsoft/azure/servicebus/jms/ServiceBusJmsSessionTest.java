@@ -58,8 +58,8 @@ public class ServiceBusJmsSessionTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         
-        // Create session with default settings (non-transacted, AUTO_ACKNOWLEDGE)
-        session = new ServiceBusJmsSession(mockConnection, mockMessagingFactory, false, Session.AUTO_ACKNOWLEDGE);
+        // Create session with default settings (AUTO_ACKNOWLEDGE)
+        session = new ServiceBusJmsSession(mockConnection, mockMessagingFactory, Session.AUTO_ACKNOWLEDGE);
         
         // Setup connection mock
         when(mockConnection.isClosed()).thenReturn(false);
@@ -79,7 +79,7 @@ public class ServiceBusJmsSessionTest {
     public void testTransactedSession() throws Exception {
         // Given
         ServiceBusJmsSession transactedSession = new ServiceBusJmsSession(
-            mockConnection, mockMessagingFactory, true, Session.SESSION_TRANSACTED);
+            mockConnection, mockMessagingFactory, Session.SESSION_TRANSACTED);
 
         // When & Then
         assertThat(transactedSession.getTransacted()).isTrue();
@@ -90,7 +90,7 @@ public class ServiceBusJmsSessionTest {
     public void testClientAcknowledgeMode() throws Exception {
         // Given
         ServiceBusJmsSession clientAckSession = new ServiceBusJmsSession(
-            mockConnection, mockMessagingFactory, false, Session.CLIENT_ACKNOWLEDGE);
+            mockConnection, mockMessagingFactory, Session.CLIENT_ACKNOWLEDGE);
 
         // When & Then
         assertThat(clientAckSession.getTransacted()).isFalse();
@@ -341,7 +341,7 @@ public class ServiceBusJmsSessionTest {
     public void testCommit_TransactedSession_NotSupported() throws Exception {
         // Given
         ServiceBusJmsSession transactedSession = new ServiceBusJmsSession(
-            mockConnection, mockMessagingFactory, true, Session.SESSION_TRANSACTED);
+            mockConnection, mockMessagingFactory, Session.SESSION_TRANSACTED);
 
         // When & Then
         assertThatThrownBy(() -> transactedSession.commit())
@@ -353,7 +353,7 @@ public class ServiceBusJmsSessionTest {
     public void testRollback_TransactedSession_NotSupported() throws Exception {
         // Given
         ServiceBusJmsSession transactedSession = new ServiceBusJmsSession(
-            mockConnection, mockMessagingFactory, true, Session.SESSION_TRANSACTED);
+            mockConnection, mockMessagingFactory, Session.SESSION_TRANSACTED);
 
         // When & Then
         assertThatThrownBy(() -> transactedSession.rollback())
@@ -376,7 +376,7 @@ public class ServiceBusJmsSessionTest {
     public void testRecover_TransactedSession() throws Exception {
         // Given
         ServiceBusJmsSession transactedSession = new ServiceBusJmsSession(
-            mockConnection, mockMessagingFactory, true, Session.SESSION_TRANSACTED);
+            mockConnection, mockMessagingFactory, Session.SESSION_TRANSACTED);
 
         // When & Then
         assertThatThrownBy(() -> transactedSession.recover())
@@ -399,7 +399,7 @@ public class ServiceBusJmsSessionTest {
     public void testAcknowledgeMessage_ClientAckMode() throws Exception {
         // Given
         ServiceBusJmsSession clientAckSession = new ServiceBusJmsSession(
-            mockConnection, mockMessagingFactory, false, Session.CLIENT_ACKNOWLEDGE);
+            mockConnection, mockMessagingFactory, Session.CLIENT_ACKNOWLEDGE);
         ServiceBusJmsMessage message = new ServiceBusJmsTextMessage(clientAckSession, "test");
 
         // When - should log warning (not yet implemented)

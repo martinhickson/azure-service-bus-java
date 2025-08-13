@@ -228,6 +228,7 @@ public class ServiceBusJmsBytesMessageTest {
         // Given
         bytesMessage.writeInt(123);
         bytesMessage.writeUTF("Hello");
+        bytesMessage.reset(); // Switch to read mode
 
         // When
         long length = bytesMessage.getBodyLength();
@@ -238,6 +239,9 @@ public class ServiceBusJmsBytesMessageTest {
 
     @Test
     public void testGetBodyLength_EmptyMessage() throws Exception {
+        // Switch to read mode first
+        bytesMessage.reset();
+        
         // When
         long length = bytesMessage.getBodyLength();
 

@@ -16,7 +16,7 @@ public class ServiceBusJmsConnectionMetaData implements ConnectionMetaData {
     private static final String JMS_VERSION = "2.0";
     private static final int JMS_MAJOR_VERSION = 2;
     private static final int JMS_MINOR_VERSION = 0;
-    private static final String PROVIDER_NAME = "Azure Service Bus";
+    private static final String PROVIDER_NAME = "Microsoft Azure Service Bus JMS Implementation";
     private static final String PROVIDER_VERSION = "1.0.0";
     private static final int PROVIDER_MAJOR_VERSION = 1;
     private static final int PROVIDER_MINOR_VERSION = 0;

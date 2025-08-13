@@ -3,6 +3,7 @@
 
 package com.microsoft.azure.servicebus.jms;
 
+import com.microsoft.azure.servicebus.ClientSettings;
 import com.microsoft.azure.servicebus.primitives.MessagingFactory;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +33,9 @@ public class ServiceBusJmsConnectionTest {
 
     @Mock
     private MessagingFactory mockMessagingFactory;
+    
+    @Mock
+    private ClientSettings mockClientSettings;
 
     private Properties connectionProperties;
 
@@ -48,6 +52,7 @@ public class ServiceBusJmsConnectionTest {
         // Create connection
         connection = new ServiceBusJmsConnection(
             URI.create("sb://test.servicebus.windows.net/"), 
+            mockClientSettings,
             connectionProperties);
     }
 
@@ -303,7 +308,7 @@ public class ServiceBusJmsConnectionTest {
 
         // When
         ServiceBusJmsConnection sasConnection = new ServiceBusJmsConnection(
-            URI.create("sb://test.servicebus.windows.net/"), sasProps);
+            URI.create("sb://test.servicebus.windows.net/"), mockClientSettings, sasProps);
 
         // Then - connection should be created successfully
         assertThat(sasConnection).isNotNull();
@@ -323,7 +328,7 @@ public class ServiceBusJmsConnectionTest {
 
         // When
         ServiceBusJmsConnection aadConnection = new ServiceBusJmsConnection(
-            URI.create("sb://test.servicebus.windows.net/"), aadProps);
+            URI.create("sb://test.servicebus.windows.net/"), mockClientSettings, aadProps);
 
         // Then
         assertThat(aadConnection).isNotNull();
@@ -340,7 +345,7 @@ public class ServiceBusJmsConnectionTest {
 
         // When
         ServiceBusJmsConnection msiConnection = new ServiceBusJmsConnection(
-            URI.create("sb://test.servicebus.windows.net/"), msiProps);
+            URI.create("sb://test.servicebus.windows.net/"), mockClientSettings, msiProps);
 
         // Then
         assertThat(msiConnection).isNotNull();
@@ -357,7 +362,7 @@ public class ServiceBusJmsConnectionTest {
 
         // When & Then
         assertThatThrownBy(() -> new ServiceBusJmsConnection(
-                URI.create("sb://invalid"), invalidProps))
+                URI.create("sb://invalid"), mockClientSettings, invalidProps))
                 .isInstanceOf(RuntimeException.class); // Constructor may throw various exceptions
     }
 
@@ -368,7 +373,7 @@ public class ServiceBusJmsConnectionTest {
 
         // When & Then
         assertThatThrownBy(() -> new ServiceBusJmsConnection(
-                URI.create("sb://test.servicebus.windows.net/"), emptyProps))
+                URI.create("sb://test.servicebus.windows.net/"), mockClientSettings, emptyProps))
                 .isInstanceOf(RuntimeException.class);
     }
 
@@ -383,7 +388,7 @@ public class ServiceBusJmsConnectionTest {
 
         // When & Then
         assertThatThrownBy(() -> new ServiceBusJmsConnection(
-                URI.create("sb://test.servicebus.windows.net/"), incompleteAAD))
+                URI.create("sb://test.servicebus.windows.net/"), mockClientSettings, incompleteAAD))
                 .isInstanceOf(RuntimeException.class);
     }
 
@@ -427,7 +432,7 @@ public class ServiceBusJmsConnectionTest {
         props.setProperty("connectionString", "Endpoint=sb://test.servicebus.windows.net/");
 
         // When & Then
-        assertThatThrownBy(() -> new ServiceBusJmsConnection(null, props))
+        assertThatThrownBy(() -> new ServiceBusJmsConnection(null, mockClientSettings, props))
                 .isInstanceOf(NullPointerException.class);
     }
 
@@ -435,7 +440,7 @@ public class ServiceBusJmsConnectionTest {
     public void testConnectionWithNullProperties() {
         // When & Then
         assertThatThrownBy(() -> new ServiceBusJmsConnection(
-                URI.create("sb://test.servicebus.windows.net/"), null))
+                URI.create("sb://test.servicebus.windows.net/"), mockClientSettings, null))
                 .isInstanceOf(NullPointerException.class);
     }
 
