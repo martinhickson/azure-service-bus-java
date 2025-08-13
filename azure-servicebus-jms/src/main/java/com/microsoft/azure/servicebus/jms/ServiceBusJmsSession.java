@@ -83,15 +83,19 @@ public class ServiceBusJmsSession implements QueueSession {
         }
         
         String queueName = queue.getQueueName();
-        IMessageSender sender = senders.computeIfAbsent(queueName, name -> {
-            try {
-                return ClientFactory.createMessageSenderFromEntityPathAsync(messagingFactory, name).get();
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to create sender for queue: " + name, e);
-            }
-        });
-        
-        return new ServiceBusJmsQueueSender(this, queue, sender);
+        try {
+            IMessageSender sender = senders.computeIfAbsent(queueName, name -> {
+                try {
+                    return ClientFactory.createMessageSenderFromEntityPathAsync(messagingFactory, name).get();
+                } catch (Exception e) {
+                    throw new RuntimeException("Failed to create sender for queue: " + name, e);
+                }
+            });
+            
+            return new ServiceBusJmsQueueSender(this, queue, sender);
+        } catch (RuntimeException e) {
+            throw new JMSException("Failed to create sender for queue: " + queueName);
+        }
     }
     
     @Override
@@ -111,19 +115,23 @@ public class ServiceBusJmsSession implements QueueSession {
         }
         
         String queueName = queue.getQueueName();
-        IMessageReceiver receiver = receivers.computeIfAbsent(queueName, name -> {
-            try {
-                ReceiveMode receiveMode = acknowledgeMode == Session.CLIENT_ACKNOWLEDGE ? 
-                    ReceiveMode.PEEKLOCK : ReceiveMode.RECEIVEANDDELETE;
-                // Use the correct ClientFactory method signature with MessagingFactory
-                return ClientFactory.createMessageReceiverFromEntityPathAsync(
-                    messagingFactory, name, com.microsoft.azure.servicebus.primitives.MessagingEntityType.QUEUE, receiveMode).get();
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to create receiver for queue: " + name, e);
-            }
-        });
-        
-        return new ServiceBusJmsQueueReceiver(this, queue, receiver);
+        try {
+            IMessageReceiver receiver = receivers.computeIfAbsent(queueName, name -> {
+                try {
+                    ReceiveMode receiveMode = acknowledgeMode == Session.CLIENT_ACKNOWLEDGE ? 
+                        ReceiveMode.PEEKLOCK : ReceiveMode.RECEIVEANDDELETE;
+                    // Use the correct ClientFactory method signature with MessagingFactory
+                    return ClientFactory.createMessageReceiverFromEntityPathAsync(
+                        messagingFactory, name, com.microsoft.azure.servicebus.primitives.MessagingEntityType.QUEUE, receiveMode).get();
+                } catch (Exception e) {
+                    throw new RuntimeException("Failed to create receiver for queue: " + name, e);
+                }
+            });
+            
+            return new ServiceBusJmsQueueReceiver(this, queue, receiver);
+        } catch (RuntimeException e) {
+            throw new JMSException("Failed to create receiver for queue: " + queueName);
+        }
     }
     
     @Override
@@ -320,6 +328,11 @@ public class ServiceBusJmsSession implements QueueSession {
     
     @Override
     public MessageProducer createProducer(Destination destination) throws JMSException {
+        if (destination == null) {
+            // JMS allows null destination for anonymous producers
+            // Create a generic sender that can send to any queue
+            return new ServiceBusJmsQueueSender(this, null, null);
+        }
         if (destination instanceof Queue) {
             return createSender((Queue) destination);
         }

@@ -225,11 +225,16 @@ public class ServiceBusJmsQueueSender implements QueueSender {
     @Override
     public void setPriority(int priority) throws JMSException {
         validateNotClosed();
-        // Validate priority range per JMS specification (0-9)
-        if (priority < 0 || priority > 9) {
-            throw new JMSException("Priority must be between 0 and 9, was: " + priority);
+        // Normalize priority to valid range per JMS specification (0-9)
+        if (priority < 0) {
+            logger.warn("Priority {} is below minimum, normalizing to 0", priority);
+            this.priority = 0;
+        } else if (priority > 9) {
+            logger.warn("Priority {} is above maximum, normalizing to 9", priority);
+            this.priority = 9;
+        } else {
+            this.priority = priority;
         }
-        this.priority = priority;
     }
     
     @Override
