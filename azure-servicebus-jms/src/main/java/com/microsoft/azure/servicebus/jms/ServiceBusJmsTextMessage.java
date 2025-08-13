@@ -50,7 +50,7 @@ public class ServiceBusJmsTextMessage extends ServiceBusJmsMessage implements Te
     @Override
     public void clearBody() throws JMSException {
         this.text = null;
-        serviceBusMessage.setMessageBody(Utils.fromBinay(new byte[0]));
+        serviceBusMessage.setMessageBody(Utils.fromBinary(new byte[0]));
     }
     
     // JMS 2.0 method
@@ -75,10 +75,10 @@ public class ServiceBusJmsTextMessage extends ServiceBusJmsMessage implements Te
     
     private void updateServiceBusMessage() {
         if (text == null) {
-            serviceBusMessage.setMessageBody(Utils.fromBinay(new byte[0]));
+            serviceBusMessage.setMessageBody(Utils.fromBinary(new byte[0]));
         } else {
             byte[] textBytes = text.getBytes(StandardCharsets.UTF_8);
-            serviceBusMessage.setMessageBody(Utils.fromBinay(textBytes));
+            serviceBusMessage.setMessageBody(Utils.fromBinary(textBytes));
         }
     }
     

@@ -46,6 +46,41 @@ public class ServiceBusJmsConnection implements QueueConnection {
     private String clientId;
     
     public ServiceBusJmsConnection(URI namespaceUri, ClientSettings clientSettings, Properties connectionProperties) {
+        // Validate constructor parameters
+        if (namespaceUri == null) {
+            throw new NullPointerException("Namespace URI cannot be null");
+        }
+        if (connectionProperties == null) {
+            throw new NullPointerException("Connection properties cannot be null");
+        }
+        
+        // Validate connection string presence
+        String connectionString = connectionProperties.getProperty("connectionString");
+        if (connectionString == null || connectionString.trim().isEmpty()) {
+            throw new RuntimeException("Connection string is required in properties");
+        }
+        
+        // Validate AAD authentication if specified
+        String authType = connectionProperties.getProperty("authType");
+        if ("AAD".equals(authType)) {
+            String clientId = connectionProperties.getProperty("clientId");
+            String clientSecret = connectionProperties.getProperty("clientSecret");
+            String tenantId = connectionProperties.getProperty("tenantId");
+            
+            if (clientId == null || clientSecret == null || tenantId == null) {
+                throw new RuntimeException("Azure AD authentication requires clientId, clientSecret, and tenantId");
+            }
+        }
+        
+        // Basic connection string validation
+        try {
+            if (!connectionString.startsWith("Endpoint=sb://") && !connectionString.startsWith("sb://")) {
+                throw new RuntimeException("Invalid connection string format");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Invalid connection string: " + e.getMessage());
+        }
+        
         this.namespaceUri = namespaceUri;
         this.clientSettings = clientSettings;
         this.connectionProperties = connectionProperties;
@@ -92,10 +127,8 @@ public class ServiceBusJmsConnection implements QueueConnection {
     @Override
     public void setClientID(String clientID) throws JMSException {
         validateNotClosed();
-        if (started.get()) {
-            throw new JMSException("Cannot set client ID after connection has been started");
-        }
-        this.clientId = clientID;
+        // Azure Service Bus does not support client identifiers
+        throw new JMSException("Client identifiers are not supported");
     }
     
     @Override

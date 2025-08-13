@@ -109,7 +109,7 @@ class MessageConverter
 			if(body instanceof Data)
 			{
 				Binary messageData = ((Data)body).getValue();
-				brokeredMessage = new Message(Utils.fromBinay(messageData.getArray()));
+				brokeredMessage = new Message(Utils.fromBinary(messageData.getArray()));
 			}
 			else if (body instanceof AmqpValue)
 			{

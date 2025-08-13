@@ -51,7 +51,7 @@ public final class Utils {
     	return MessageBody.fromSequenceData(sequenceData);
     }
     
-    public static MessageBody fromBinay(byte[] binary)
+    public static MessageBody fromBinary(byte[] binary)
     {
     	List<byte[]> binaryData = new ArrayList<>();
     	binaryData.add(binary);

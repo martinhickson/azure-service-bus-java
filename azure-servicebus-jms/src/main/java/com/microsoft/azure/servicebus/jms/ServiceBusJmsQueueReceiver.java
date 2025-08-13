@@ -70,7 +70,23 @@ public class ServiceBusJmsQueueReceiver implements QueueReceiver {
     
     @Override
     public Message receive() throws JMSException {
-        return receive(0); // Block indefinitely
+        validateNotClosed();
+        
+        try {
+            IMessage serviceBusMessage = messageReceiver.receive();
+            
+            if (serviceBusMessage == null) {
+                return null;
+            }
+            
+            return convertToJmsMessage(serviceBusMessage);
+            
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new JMSException("Failed to receive message: " + e.getMessage());
+        } catch (Exception e) {
+            throw new JMSException("Failed to receive message: " + e.getMessage());
+        }
     }
     
     @Override
@@ -80,8 +96,8 @@ public class ServiceBusJmsQueueReceiver implements QueueReceiver {
         try {
             IMessage serviceBusMessage;
             if (timeout == 0) {
-                // Block indefinitely - use the parameterless receive
-                serviceBusMessage = messageReceiver.receive();
+                // Zero timeout means immediate return (non-blocking)
+                serviceBusMessage = messageReceiver.receive(Duration.ZERO);
             } else if (timeout < 0) {
                 throw new JMSException("Invalid timeout: " + timeout);
             } else {
@@ -96,7 +112,7 @@ public class ServiceBusJmsQueueReceiver implements QueueReceiver {
             
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new JMSException("Receive operation interrupted");
+            throw new JMSException("Failed to receive message: " + e.getMessage());
         } catch (Exception e) {
             throw new JMSException("Failed to receive message: " + e.getMessage());
         }
@@ -117,7 +133,7 @@ public class ServiceBusJmsQueueReceiver implements QueueReceiver {
             
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new JMSException("Receive operation interrupted");
+            throw new JMSException("Failed to receive message: " + e.getMessage());
         } catch (Exception e) {
             throw new JMSException("Failed to receive message: " + e.getMessage());
         }
@@ -131,6 +147,7 @@ public class ServiceBusJmsQueueReceiver implements QueueReceiver {
                 messageReceiver.close();
             } catch (Exception e) {
                 logger.warn("Error closing message receiver", e);
+                throw new JMSException("Failed to close receiver: " + e.getMessage());
             }
         }
     }

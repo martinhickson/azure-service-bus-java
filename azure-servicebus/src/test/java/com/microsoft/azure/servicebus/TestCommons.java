@@ -80,7 +80,7 @@ public class TestCommons {
         {
             binaryData[i] = (byte)i;
         }
-        Message message = new Message(Utils.fromBinay(binaryData));
+        Message message = new Message(Utils.fromBinary(binaryData));
         message.setMessageId(messageId);
         if(sessionId != null)
         {

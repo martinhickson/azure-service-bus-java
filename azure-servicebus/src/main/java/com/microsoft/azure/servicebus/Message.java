@@ -16,7 +16,7 @@ public class Message implements Serializable, IMessage {
 	private static final Charset DEFAULT_CHAR_SET = Charset.forName("UTF-8");
 	private static final String DEFAULT_CONTENT_TYPE = null;
 	
-	private static final MessageBody DEFAULT_CONTENT = Utils.fromBinay(new byte[0]);
+	private static final MessageBody DEFAULT_CONTENT = Utils.fromBinary(new byte[0]);
 
 	private long deliveryCount;
 	
@@ -81,7 +81,7 @@ public class Message implements Serializable, IMessage {
 	 */
 	public Message(byte[] content)
 	{
-		this(Utils.fromBinay(content));
+		this(Utils.fromBinary(content));
 	}
 	
 	/**
@@ -110,7 +110,7 @@ public class Message implements Serializable, IMessage {
 	 */
 	public Message(byte[] content, String contentType)
 	{
-		this(Utils.fromBinay(content), contentType);
+		this(Utils.fromBinary(content), contentType);
 	}
 	
 	/**
@@ -142,7 +142,7 @@ public class Message implements Serializable, IMessage {
 	 */
 	public Message(String messageId, byte[] content, String contentType)
 	{
-		this(messageId, Utils.fromBinay(content), contentType);
+		this(messageId, Utils.fromBinary(content), contentType);
 	}
 
 	/**
@@ -371,7 +371,7 @@ public class Message implements Serializable, IMessage {
 	@Deprecated
 	public void setBody(byte[] body)
 	{
-		this.messageBody = Utils.fromBinay(body);
+		this.messageBody = Utils.fromBinary(body);
 	}
 
 	@Override

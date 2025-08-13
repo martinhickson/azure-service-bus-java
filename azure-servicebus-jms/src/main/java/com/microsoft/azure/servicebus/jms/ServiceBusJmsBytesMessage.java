@@ -330,7 +330,7 @@ public class ServiceBusJmsBytesMessage extends ServiceBusJmsMessage implements B
     @Override
     public void clearBody() throws JMSException {
         initializeForWrite();
-        serviceBusMessage.setMessageBody(Utils.fromBinay(new byte[0]));
+        serviceBusMessage.setMessageBody(Utils.fromBinary(new byte[0]));
     }
     
     // JMS 2.0 method
@@ -393,7 +393,7 @@ public class ServiceBusJmsBytesMessage extends ServiceBusJmsMessage implements B
     }
     
     private void updateServiceBusMessage(byte[] data) {
-        serviceBusMessage.setMessageBody(Utils.fromBinay(data));
+        serviceBusMessage.setMessageBody(Utils.fromBinary(data));
     }
     
     private byte[] extractBytesFromServiceBusMessage(IMessage serviceBusMessage) {
