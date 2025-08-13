@@ -53,8 +53,8 @@ public class ServiceBusJmsSession implements QueueSession {
     private final AtomicBoolean transacted = new AtomicBoolean(false);
     
     // Cache for senders and receivers
-    private final Map<String, IMessageSender> senders = new ConcurrentHashMap<>();
-    private final Map<String, IMessageReceiver> receivers = new ConcurrentHashMap<>();
+    final Map<String, IMessageSender> senders = new ConcurrentHashMap<>();  // Package private for testing
+    final Map<String, IMessageReceiver> receivers = new ConcurrentHashMap<>();  // Package private for testing
     
     public ServiceBusJmsSession(ServiceBusJmsConnection connection, 
                                MessagingFactory messagingFactory, 
@@ -62,6 +62,11 @@ public class ServiceBusJmsSession implements QueueSession {
         this.connection = connection;
         this.messagingFactory = messagingFactory;
         this.acknowledgeMode = acknowledgeMode;
+        
+        // Set transacted based on acknowledge mode per JMS specification
+        if (acknowledgeMode == Session.SESSION_TRANSACTED) {
+            this.transacted.set(true);
+        }
     }
     
     @Override

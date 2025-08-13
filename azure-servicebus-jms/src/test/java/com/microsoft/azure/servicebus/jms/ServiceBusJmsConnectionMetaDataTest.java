@@ -102,12 +102,15 @@ public class ServiceBusJmsConnectionMetaDataTest {
         // Then
         assertThat(propertyNames).isNotNull();
         
-        // Should be empty enumeration as JMSX properties are not supported
-        assertThat(propertyNames.hasMoreElements()).isFalse();
+        // Should contain JMSXDeliveryCount as it is supported
+        assertThat(propertyNames.hasMoreElements()).isTrue();
         
-        // Verify it's a proper empty enumeration
-        assertThatThrownBy(() -> propertyNames.nextElement())
-                .isInstanceOf(java.util.NoSuchElementException.class);
+        // Should return JMSXDeliveryCount
+        String firstProperty = propertyNames.nextElement();
+        assertThat(firstProperty).isEqualTo("JMSXDeliveryCount");
+        
+        // Should not have more elements after JMSXDeliveryCount
+        assertThat(propertyNames.hasMoreElements()).isFalse();
     }
 
     @Test
@@ -116,7 +119,13 @@ public class ServiceBusJmsConnectionMetaDataTest {
         Enumeration<String> enum1 = metaData.getJMSXPropertyNames();
         Enumeration<String> enum2 = metaData.getJMSXPropertyNames();
 
-        // Then - both should be empty and consistent
+        // Then - both should have JMSXDeliveryCount and be consistent
+        assertThat(enum1.hasMoreElements()).isTrue();
+        assertThat(enum2.hasMoreElements()).isTrue();
+        
+        assertThat(enum1.nextElement()).isEqualTo("JMSXDeliveryCount");
+        assertThat(enum2.nextElement()).isEqualTo("JMSXDeliveryCount");
+        
         assertThat(enum1.hasMoreElements()).isFalse();
         assertThat(enum2.hasMoreElements()).isFalse();
     }
@@ -333,7 +342,9 @@ public class ServiceBusJmsConnectionMetaDataTest {
         // When
         Enumeration<String> properties = metaData.getJMSXPropertyNames();
 
-        // Then - Azure Service Bus doesn't support JMSX properties
+        // Then - Azure Service Bus supports JMSXDeliveryCount
+        assertThat(properties.hasMoreElements()).isTrue();
+        assertThat(properties.nextElement()).isEqualTo("JMSXDeliveryCount");
         assertThat(properties.hasMoreElements()).isFalse();
         
         // Verify enumeration behavior

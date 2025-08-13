@@ -80,6 +80,11 @@ public class ServiceBusJmsQueueSender implements QueueSender {
             throw new MessageFormatException("Message must be a ServiceBusJmsMessage");
         }
         
+        // Validate priority range per JMS specification (0-9)
+        if (priority < 0 || priority > 9) {
+            throw new JMSException("Priority must be between 0 and 9, was: " + priority);
+        }
+        
         ServiceBusJmsMessage jmsMessage = (ServiceBusJmsMessage) message;
         com.microsoft.azure.servicebus.Message serviceBusMessage = jmsMessage.getServiceBusMessage();
         
@@ -220,6 +225,10 @@ public class ServiceBusJmsQueueSender implements QueueSender {
     @Override
     public void setPriority(int priority) throws JMSException {
         validateNotClosed();
+        // Validate priority range per JMS specification (0-9)
+        if (priority < 0 || priority > 9) {
+            throw new JMSException("Priority must be between 0 and 9, was: " + priority);
+        }
         this.priority = priority;
     }
     

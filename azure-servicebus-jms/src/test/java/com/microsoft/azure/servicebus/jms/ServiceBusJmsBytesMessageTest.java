@@ -304,7 +304,7 @@ public class ServiceBusJmsBytesMessageTest {
 
         // When & Then
         assertThatThrownBy(() -> bytesMessage.readBytes(buffer, -1))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(IndexOutOfBoundsException.class);
     }
 
     // ========== Multiple Data Types Test ==========

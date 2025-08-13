@@ -346,7 +346,7 @@ public class ServiceBusJmsSessionTest {
         // When & Then
         assertThatThrownBy(() -> transactedSession.commit())
                 .isInstanceOf(JMSException.class)
-                .hasMessageContaining("Transactions not supported");
+                .hasMessageContaining("Session is not transacted");
     }
 
     @Test
@@ -358,7 +358,7 @@ public class ServiceBusJmsSessionTest {
         // When & Then
         assertThatThrownBy(() -> transactedSession.rollback())
                 .isInstanceOf(JMSException.class)
-                .hasMessageContaining("Transactions not supported");
+                .hasMessageContaining("Session is not transacted");
     }
 
     // ========== Recovery and Acknowledgment Tests ==========

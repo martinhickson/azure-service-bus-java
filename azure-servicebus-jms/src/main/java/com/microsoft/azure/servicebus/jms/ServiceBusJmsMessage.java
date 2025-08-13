@@ -185,6 +185,10 @@ public class ServiceBusJmsMessage implements javax.jms.Message {
     
     @Override
     public void setJMSPriority(int priority) throws JMSException {
+        // Validate priority range per JMS specification (0-9)
+        if (priority < 0 || priority > 9) {
+            throw new JMSException("Priority must be between 0 and 9, was: " + priority);
+        }
         this.jmsPriority = priority;
     }
     
@@ -209,6 +213,9 @@ public class ServiceBusJmsMessage implements javax.jms.Message {
     
     @Override
     public boolean propertyExists(String name) throws JMSException {
+        if (name == null) {
+            throw new IllegalArgumentException("Property name cannot be null");
+        }
         return properties.containsKey(name);
     }
     
@@ -217,6 +224,12 @@ public class ServiceBusJmsMessage implements javax.jms.Message {
         Object value = properties.get(name);
         if (value == null) return false;
         if (value instanceof Boolean) return (Boolean) value;
+        if (value instanceof String) {
+            String strValue = (String) value;
+            if ("true".equalsIgnoreCase(strValue)) return true;
+            if ("false".equalsIgnoreCase(strValue)) return false;
+            throw new MessageFormatException("Cannot convert '" + value + "' to boolean");
+        }
         throw new MessageFormatException("Property " + name + " is not a boolean");
     }
     
@@ -244,6 +257,13 @@ public class ServiceBusJmsMessage implements javax.jms.Message {
         if (value instanceof Integer) return (Integer) value;
         if (value instanceof Short) return (Short) value;
         if (value instanceof Byte) return (Byte) value;
+        if (value instanceof String) {
+            try {
+                return Integer.parseInt((String) value);
+            } catch (NumberFormatException e) {
+                throw new NumberFormatException("Cannot convert '" + value + "' to int");
+            }
+        }
         throw new MessageFormatException("Property " + name + " is not an int");
     }
     
@@ -255,6 +275,13 @@ public class ServiceBusJmsMessage implements javax.jms.Message {
         if (value instanceof Integer) return (Integer) value;
         if (value instanceof Short) return (Short) value;
         if (value instanceof Byte) return (Byte) value;
+        if (value instanceof String) {
+            try {
+                return Long.parseLong((String) value);
+            } catch (NumberFormatException e) {
+                throw new NumberFormatException("Cannot convert '" + value + "' to long");
+            }
+        }
         throw new MessageFormatException("Property " + name + " is not a long");
     }
     
@@ -263,6 +290,13 @@ public class ServiceBusJmsMessage implements javax.jms.Message {
         Object value = properties.get(name);
         if (value == null) throw new NumberFormatException("Property " + name + " is null");
         if (value instanceof Float) return (Float) value;
+        if (value instanceof String) {
+            try {
+                return Float.parseFloat((String) value);
+            } catch (NumberFormatException e) {
+                throw new NumberFormatException("Cannot convert '" + value + "' to float");
+            }
+        }
         throw new MessageFormatException("Property " + name + " is not a float");
     }
     
@@ -272,11 +306,24 @@ public class ServiceBusJmsMessage implements javax.jms.Message {
         if (value == null) throw new NumberFormatException("Property " + name + " is null");
         if (value instanceof Double) return (Double) value;
         if (value instanceof Float) return (Float) value;
+        if (value instanceof String) {
+            try {
+                return Double.parseDouble((String) value);
+            } catch (NumberFormatException e) {
+                throw new NumberFormatException("Cannot convert '" + value + "' to double");
+            }
+        }
         throw new MessageFormatException("Property " + name + " is not a double");
     }
     
     @Override
     public String getStringProperty(String name) throws JMSException {
+        if (name == null) {
+            throw new IllegalArgumentException("Property name cannot be null");
+        }
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("Property name cannot be empty");
+        }
         Object value = properties.get(name);
         return value != null ? value.toString() : null;
     }
@@ -328,6 +375,12 @@ public class ServiceBusJmsMessage implements javax.jms.Message {
     
     @Override
     public void setStringProperty(String name, String value) throws JMSException {
+        if (name == null) {
+            throw new IllegalArgumentException("Property name cannot be null");
+        }
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("Property name cannot be empty");
+        }
         setObjectProperty(name, value);
     }
     

@@ -135,7 +135,7 @@ public class ServiceBusJmsQueueReceiver implements QueueReceiver {
         }
     }
     
-    private Message convertToJmsMessage(IMessage serviceBusMessage) throws JMSException {
+    Message convertToJmsMessage(IMessage serviceBusMessage) throws JMSException { // Package private for testing
         try {
             MessageBody body = serviceBusMessage.getMessageBody();
             

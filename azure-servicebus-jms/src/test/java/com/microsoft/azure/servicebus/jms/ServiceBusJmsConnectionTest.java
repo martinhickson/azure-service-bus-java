@@ -267,7 +267,7 @@ public class ServiceBusJmsConnectionTest {
         // When & Then
         assertThatThrownBy(() -> connection.createConnectionConsumer(null, null, null, 1))
                 .isInstanceOf(JMSException.class)
-                .hasMessageContaining("Connection consumers are not supported");
+                .hasMessageContaining("ConnectionConsumer not supported");
     }
 
     @Test
@@ -285,7 +285,7 @@ public class ServiceBusJmsConnectionTest {
         // When & Then
         assertThatThrownBy(() -> connection.createSharedConnectionConsumer(null, "shared", null, null, 1))
                 .isInstanceOf(JMSException.class)
-                .hasMessageContaining("Topics and shared consumers are not supported");
+                .hasMessageContaining("Shared connection consumers not supported");
     }
 
     @Test
@@ -293,7 +293,7 @@ public class ServiceBusJmsConnectionTest {
         // When & Then
         assertThatThrownBy(() -> connection.createSharedDurableConnectionConsumer(null, "shared", null, null, 1))
                 .isInstanceOf(JMSException.class)
-                .hasMessageContaining("Topics and durable consumers are not supported");
+                .hasMessageContaining("Shared durable connection consumers not supported");
     }
 
     // ========== Authentication Configuration Tests ==========

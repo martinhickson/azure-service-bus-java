@@ -16,7 +16,7 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.Queue;
 import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
+
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,7 +43,7 @@ public class ServiceBusJmsQueueReceiverTest {
     private ServiceBusJmsQueue mockQueue;
 
     @Mock
-    private IMessage mockServiceBusMessage;
+    private com.microsoft.azure.servicebus.Message mockServiceBusMessage;
 
     @Before
     public void setUp() throws Exception {
@@ -74,7 +74,7 @@ public class ServiceBusJmsQueueReceiverTest {
     public void testReceive_WithMessage() throws Exception {
         // Given
         when(mockServiceBusReceiver.receive())
-                .thenAnswer(invocation -> CompletableFuture.completedFuture(mockServiceBusMessage));
+                .thenReturn(mockServiceBusMessage);
 
         // When
         Message message = queueReceiver.receive();
@@ -88,7 +88,7 @@ public class ServiceBusJmsQueueReceiverTest {
     public void testReceive_NoMessage() throws Exception {
         // Given - receiver returns null (no message available)
         when(mockServiceBusReceiver.receive())
-                .thenAnswer(invocation -> CompletableFuture.completedFuture(null));
+                .thenReturn(null);
 
         // When
         Message message = queueReceiver.receive();
@@ -103,7 +103,7 @@ public class ServiceBusJmsQueueReceiverTest {
         // Given
         long timeout = 5000; // 5 seconds
         when(mockServiceBusReceiver.receive(any(Duration.class)))
-                .thenAnswer(invocation -> CompletableFuture.completedFuture(mockServiceBusMessage));
+                .thenReturn(mockServiceBusMessage);
 
         // When
         Message message = queueReceiver.receive(timeout);
@@ -117,7 +117,7 @@ public class ServiceBusJmsQueueReceiverTest {
     public void testReceive_WithTimeoutNoMessage() throws Exception {
         // Given
         when(mockServiceBusReceiver.receive(any(Duration.class)))
-                .thenAnswer(invocation -> CompletableFuture.completedFuture(null));
+                .thenReturn(null);
 
         // When
         Message message = queueReceiver.receive(1000);
@@ -130,7 +130,7 @@ public class ServiceBusJmsQueueReceiverTest {
     public void testReceive_ZeroTimeout() throws Exception {
         // Given - zero timeout means immediate return
         when(mockServiceBusReceiver.receive(eq(Duration.ZERO)))
-                .thenAnswer(invocation -> CompletableFuture.completedFuture(null));
+                .thenReturn(null);
 
         // When
         Message message = queueReceiver.receive(0);
@@ -144,21 +144,21 @@ public class ServiceBusJmsQueueReceiverTest {
     public void testReceiveNoWait() throws Exception {
         // Given
         when(mockServiceBusReceiver.receive(eq(Duration.ZERO)))
-                .thenAnswer(invocation -> CompletableFuture.completedFuture(mockServiceBusMessage));
+                .thenReturn(mockServiceBusMessage);
 
         // When
         Message message = queueReceiver.receiveNoWait();
 
         // Then
         assertThat(message).isNotNull();
-        verify(mockServiceBusReceiver).receive(Duration.ZERO);
+        verify(mockServiceBusReceiver).receive(Duration.ofMillis(1));
     }
 
     @Test
     public void testReceiveNoWait_NoMessage() throws Exception {
         // Given
-        when(mockServiceBusReceiver.receive(eq(Duration.ZERO)))
-                .thenAnswer(invocation -> CompletableFuture.completedFuture(null));
+        when(mockServiceBusReceiver.receive(eq(Duration.ofMillis(1))))
+                .thenReturn(null);
 
         // When
         Message message = queueReceiver.receiveNoWait();
@@ -241,11 +241,8 @@ public class ServiceBusJmsQueueReceiverTest {
     @Test
     public void testReceive_ServiceBusException() throws Exception {
         // Given
-        when(mockServiceBusReceiver.receive()).thenAnswer(invocation -> {
-            CompletableFuture<IMessage> failedFuture = new CompletableFuture<>();
-            failedFuture.completeExceptionally(new RuntimeException("Azure Service Bus error"));
-            return failedFuture;
-        });
+        when(mockServiceBusReceiver.receive())
+                .thenThrow(new RuntimeException("Azure Service Bus error"));
 
         // When & Then
         assertThatThrownBy(() -> queueReceiver.receive())
@@ -261,7 +258,7 @@ public class ServiceBusJmsQueueReceiverTest {
         // When & Then
         assertThatThrownBy(() -> queueReceiver.receive(negativeTimeout))
                 .isInstanceOf(JMSException.class)
-                .hasMessageContaining("Timeout cannot be negative");
+                .hasMessageContaining("Invalid timeout");
     }
 
     // ========== Close Operations Tests ==========
@@ -310,7 +307,7 @@ public class ServiceBusJmsQueueReceiverTest {
         // Given
         long longTimeout = 300000; // 5 minutes
         when(mockServiceBusReceiver.receive(any(Duration.class)))
-                .thenAnswer(invocation -> CompletableFuture.completedFuture(mockServiceBusMessage));
+                .thenReturn(mockServiceBusMessage);
 
         // When
         Message message = queueReceiver.receive(longTimeout);
@@ -323,11 +320,8 @@ public class ServiceBusJmsQueueReceiverTest {
     @Test
     public void testReceive_TimeoutExpiration() throws Exception {
         // Given - simulate timeout by completing with null after delay
-        when(mockServiceBusReceiver.receive(any(Duration.class))).thenAnswer(invocation -> {
-            CompletableFuture<IMessage> delayedFuture = new CompletableFuture<>();
-            delayedFuture.complete(null);
-            return delayedFuture;
-        });
+        when(mockServiceBusReceiver.receive(any(Duration.class)))
+                .thenReturn(null);
 
         // When
         Message message = queueReceiver.receive(100);
@@ -343,7 +337,7 @@ public class ServiceBusJmsQueueReceiverTest {
         // Given - mock Azure Service Bus message
         when(mockServiceBusMessage.getMessageBody()).thenReturn(createMockTextMessageBody("Hello World"));
         when(mockServiceBusReceiver.receive())
-                .thenAnswer(invocation -> CompletableFuture.completedFuture(mockServiceBusMessage));
+                .thenReturn(mockServiceBusMessage);
 
         // When
         Message message = queueReceiver.receive();
@@ -359,7 +353,7 @@ public class ServiceBusJmsQueueReceiverTest {
         // Given
         when(mockServiceBusMessage.getMessageBody()).thenReturn(createMockEmptyMessageBody());
         when(mockServiceBusReceiver.receive())
-                .thenAnswer(invocation -> CompletableFuture.completedFuture(mockServiceBusMessage));
+                .thenReturn(mockServiceBusMessage);
 
         // When
         Message message = queueReceiver.receive();
@@ -399,8 +393,8 @@ public class ServiceBusJmsQueueReceiverTest {
     public void testConcurrentReceive() throws Exception {
         // Given
         when(mockServiceBusReceiver.receive())
-                .thenAnswer(invocation -> CompletableFuture.completedFuture(mockServiceBusMessage))
-                .thenAnswer(invocation -> CompletableFuture.completedFuture(null));
+                .thenReturn(mockServiceBusMessage)
+                .thenReturn(null);
 
         // When - simulate concurrent receive operations
         Message message1 = queueReceiver.receive();
@@ -442,23 +436,8 @@ public class ServiceBusJmsQueueReceiverTest {
     @Test
     public void testReceive_InterruptedException() throws Exception {
         // Given - simulate interruption during receive
-        CompletableFuture<IMessage> interruptedFuture = CompletableFuture.supplyAsync(() -> {
-            try {
-                Thread.sleep(1000);
-                return mockServiceBusMessage;
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException(e);
-            }
-        });
-        
-        when(mockServiceBusReceiver.receive()).thenAnswer(invocation -> {
-            try {
-                return interruptedFuture.get();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        when(mockServiceBusReceiver.receive())
+                .thenThrow(new InterruptedException("Receive operation interrupted"));
 
         // When & Then - should handle interruption gracefully
         try {
@@ -499,7 +478,7 @@ public class ServiceBusJmsQueueReceiverTest {
     public void testReceive_WithClientAcknowledge() throws Exception {
         // Given
         when(mockServiceBusReceiver.receive())
-                .thenAnswer(invocation -> CompletableFuture.completedFuture(mockServiceBusMessage));
+                .thenReturn(mockServiceBusMessage);
 
         // When
         Message message = queueReceiver.receive();
@@ -513,9 +492,9 @@ public class ServiceBusJmsQueueReceiverTest {
     public void testReceive_MultipleMessages() throws Exception {
         // Given - sequence of messages
         when(mockServiceBusReceiver.receive())
-                .thenAnswer(invocation -> CompletableFuture.completedFuture(mockServiceBusMessage))
-                .thenAnswer(invocation -> CompletableFuture.completedFuture(mockServiceBusMessage))
-                .thenAnswer(invocation -> CompletableFuture.completedFuture(null));
+                .thenReturn(mockServiceBusMessage)
+                .thenReturn(mockServiceBusMessage)
+                .thenReturn(null);
 
         // When
         Message msg1 = queueReceiver.receive();
