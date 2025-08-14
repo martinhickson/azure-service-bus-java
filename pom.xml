@@ -1,24 +1,105 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<name>azure-servicebus-parent</name>
-	<description>Java library for Azure Service Bus</description>	
-	<modelVersion>4.0.0</modelVersion>	
-	<groupId>com.microsoft.azure</groupId>
-	<artifactId>azure-servicebus-parent</artifactId>
-	<version>1.0.0</version> <!-- Need not change this for every release -->
-	<packaging>pom</packaging>
-	
-	<url>https://github.com/Azure/azure-service-bus-java</url>
-	
-	<properties>
-		<proton-j-version>0.31.0</proton-j-version>
-	  	<junit-version>4.12</junit-version>
-		<slf4j-version>1.7.0</slf4j-version>
-		<client-current-version>1.2.18</client-current-version>		
-	</properties>
-	
-	    <modules>
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.microsoft.azure</groupId>
+    <artifactId>azure-servicebus-parent</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <name>Azure Service Bus Java SDK Parent</name>
+    <description>Parent POM for Azure Service Bus Java SDK modules</description>
+    <url>https://github.com/Azure/azure-service-bus-java</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <client-current-version>1.2.18</client-current-version>
+        
+        <!-- Core SDK dependency versions -->
+        <proton-j-version>0.33.8</proton-j-version>
+        <junit-version>4.13.2</junit-version>
+        <slf4j-version>1.7.36</slf4j-version>
+        
+        <!-- JMS/JCA dependency versions -->
+        <junit.version>4.13.2</junit.version>
+        <mockito.version>3.12.4</mockito.version>
+        <assertj.version>3.24.2</assertj.version>
+        <jacoco.version>0.8.8</jacoco.version>
+    </properties>
+
+    <modules>
         <module>azure-servicebus</module>
         <module>azure-servicebus-jms</module>
         <module>azure-servicebus-jca</module>
-    </modules>	
+    </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.11.0</version>
+                    <configuration>
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
+                    </configuration>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.0.0</version>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- JUnit -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            
+            <!-- Mockito -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+            
+            <!-- AssertJ -->
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${assertj.version}</version>
+                <scope>test</scope>
+            </dependency>
+            
+            <!-- SLF4J -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
 </project>

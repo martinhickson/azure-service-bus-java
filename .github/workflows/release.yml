@@ -19,52 +19,29 @@ jobs:
         distribution: 'temurin'
         
     - name: Cache Maven dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.m2
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-maven-
           
-    - name: Build and Install Core SDK
+    - name: Build and Package All Modules
       run: |
-        cd azure-servicebus
-        mvn clean install -DskipTests -B
-        
-    - name: Package JMS Implementation
-      run: |
-        cd azure-servicebus-jms
-        mvn clean package -DskipTests -B
-        
-    - name: Package JCA Implementation
-      run: |
-        cd azure-servicebus-jca
         mvn clean package -DskipTests -B
         
     - name: Create Source Bundle
       run: |
-        tar -czf azure-servicebus-java-source-${{ github.sha }}.tar.gz \
-          --exclude='.git*' \
-          --exclude='target' \
-          --exclude='*.log' \
-          .
+        # Use git archive for clean, consistent source bundles
+        git archive --format=tar.gz --prefix=azure-servicebus-java/ \
+          -o azure-servicebus-java-source-${{ github.sha }}.tar.gz \
+          HEAD
         
-    - name: Upload Build Artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: release-artifacts-${{ github.sha }}
-        path: |
-          azure-servicebus-jms/target/*.jar
-          azure-servicebus-jca/target/*.rar
-          azure-servicebus-java-source-${{ github.sha }}.tar.gz
-          
     - name: Create Draft Release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: softprops/action-gh-release@v2
       with:
         tag_name: release-${{ github.run_number }}
-        release_name: Azure Service Bus Java Release ${{ github.run_number }}
+        name: Azure Service Bus Java Release ${{ github.run_number }}
         body: |
           ## Azure Service Bus Java SDK Release
           
@@ -77,8 +54,10 @@ jobs:
           - **JCA RAR**: `azure-servicebus-jca-*.rar` - JCA 1.7 Resource Adapter  
           - **Source Bundle**: `azure-servicebus-java-source-*.tar.gz` - Complete source code
           
-          > Download artifacts from the Actions run and attach them to this release before publishing.
-          
           ### Coverage Achieved: 77.4% line, 65.2% branch
         draft: true
         prerelease: false
+        files: |
+          azure-servicebus-jms/target/*.jar
+          azure-servicebus-jca/target/*.rar
+          azure-servicebus-java-source-${{ github.sha }}.tar.gz
