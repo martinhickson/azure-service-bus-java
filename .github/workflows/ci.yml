@@ -1,0 +1,63 @@
+name: Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: 'Skip tests during build'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+        - 'true'
+        - 'false'
+
+jobs:
+  build:
+    name: Build Azure Service Bus
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 11
+      uses: actions/setup-java@v4
+      with:
+        java-version: '11'
+        distribution: 'temurin'
+        
+    - name: Cache Maven dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+          
+    - name: Build and Install Core SDK
+      run: |
+        cd azure-servicebus
+        if [ "${{ inputs.skip_tests }}" = "true" ]; then
+          mvn clean install -DskipTests -B
+        else
+          mvn clean install -B
+        fi
+        
+    - name: Build JMS Implementation
+      run: |
+        cd azure-servicebus-jms
+        if [ "${{ inputs.skip_tests }}" = "true" ]; then
+          mvn clean install -DskipTests -B
+        else
+          mvn clean install -B
+        fi
+        
+    - name: Build JCA Implementation
+      run: |
+        cd azure-servicebus-jca
+        if [ "${{ inputs.skip_tests }}" = "true" ]; then
+          mvn clean install -DskipTests -B
+        else
+          mvn clean install -B
+        fi
